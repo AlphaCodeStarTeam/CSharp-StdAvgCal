@@ -22,12 +22,12 @@ namespace StdAvgCal.Controller.InvertedMap
                 InvertedAvgScores.Add(studentAvg, new HashSet<Student>() {student});
         }
 
-        public double CalculateAvg(HashSet<StudentScore> scores)
+        public double CalculateAvg(List<double> scores)
         {
             double avg = 0;
-            foreach (StudentScore studentScore in scores)
+            foreach (double score in scores)
             {
-                avg += studentScore.Score;
+                avg += score;
             }
 
             return avg / scores.Count;

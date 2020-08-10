@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using StdAvgCal.Controller.InvertedMap;
 using StdAvgCal.Controller.Utils;
 using StdAvgCal.Model;
@@ -8,55 +10,58 @@ namespace StdAvgCal.Controller
 {
     public class Controller
     {
-        private List<IInitialize> _initializes;
-        
         private AvgIndexer _avgIndexer;
-        private Dictionary<Student, HashSet<StudentScore>> _studentLogs;
-        private Dictionary<int, Student> _students;
+        // private Dictionary<Student, HashSet<StudentScore>> _studentLogs;
+        // private Dictionary<int, Student> _students;
+        private List<StudentScore> _scores;
+        private List<Student> _students;
 
         public Controller()
         {
-            _initializes = new List<IInitialize>();
-            IInitialize initialize;
+            _avgIndexer = new AvgIndexer();
+            _scores = FileReader.GetAllScores();
+            _students = FileReader.GetAllStudents();
         }
 
-        private void InitStudents()
+        public double GetAvg(string firstName, string lastName)
         {
-            _students = new Dictionary<int, Student>();
-            
-            foreach (Student student in FileReader.GetAllStudents())
-            {
-                _students.Add(student.StudentNumber, student);
-            }
+            var student = _students.Find(std =>
+                std.FullName.ToLower().Equals(firstName.ToLower() + " " + lastName.ToLower()));
+            if (student == null)
+                throw new StudentNotFoundException();
+            return _avgIndexer.CalculateAvg(GetScoresByStudentNumber(student.StudentNumber));
+        }
+
+        private double GetAvg(int studentNumber)
+        {
+            var student = _students.Find(std => std.StudentNumber == studentNumber);
+            if (student == null)
+                throw new StudentNotFoundException();
+            return _avgIndexer.CalculateAvg(GetScoresByStudentNumber(student.StudentNumber));
+        }
+
+        private List<double> GetScoresByStudentNumber(int studentNumber)
+        {
+            return _scores
+                .Where(score => score.StudentNumber == studentNumber)
+                .Select(score => score.Score)
+                .ToList();
+        }
+
+        public List<Student> GetStudentsRanking(int n)
+        {
+            return _students
+                .Select(student => new {student, avg = GetAvg(student.StudentNumber)})
+                .OrderByDescending(stdAvg => stdAvg.avg)
+                .Select(stdAvg => stdAvg.student)
+                .Take(n)
+                .ToList();
         }
         
-        private void InitStudentLogs()
-        {
-            _studentLogs = new Dictionary<Student, HashSet<StudentScore>>();
+    }
 
-            foreach (StudentScore studentScore in FileReader.GetAllScores())
-            {
-                PutScoreInStudentLogs(studentScore);
-            }
-        }
-
-        private void PutScoreInStudentLogs(StudentScore studentScore)
-        {
-            Student student = _students[studentScore.StudentNumber];
-            
-            if (_studentLogs.ContainsKey(student))
-                _studentLogs[student].Add(studentScore);
-            else
-                _studentLogs.Add(student, new HashSet<StudentScore>(){studentScore});
-        }
-
-        private void InitAvgIndexer()
-        {
-            _avgIndexer = new AvgIndexer();
-            
-            foreach (Student student in _studentLogs.Keys)
-                _avgIndexer.AddToAvgScores(_avgIndexer.CalculateAvg(_studentLogs[student]), student);
-        }
+    public class StudentNotFoundException : Exception
+    {
         
     }
 }
