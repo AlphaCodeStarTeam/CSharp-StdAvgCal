@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using StdAvgCal.Model;
+using StdAvgCal.Model.Existence;
 
 namespace StdAvgCal
 {
@@ -6,7 +9,7 @@ namespace StdAvgCal
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            
         }
     }
 }
