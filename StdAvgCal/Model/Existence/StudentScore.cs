@@ -7,33 +7,11 @@ namespace StdAvgCal.Model.Existence
         public int StudentNumber { get; set; }
         public string Lesson { get; set; }
 
-        private double _score;
-        private int _roundingBound = 2;
-
-        public int RoundingBound
-        {
-            set
-            {
-                _roundingBound = value;
-            }
-        }
-
-        public double Score
-        {
-            get
-            {
-                return RoundDouble(_score, _roundingBound);
-            }
-
-            set
-            {
-                _score = value;
-            }
-        }
+        public double Score { get; set; }
 
         private double RoundDouble(double number, int roundingBound)
         {
-            int temp = (int) (_score * PowerInteger(10, roundingBound));
+            int temp = (int) (number * PowerInteger(10, roundingBound));
             double score = ((double)temp) / PowerInteger(10, roundingBound);
             return score;
         }
@@ -47,6 +25,11 @@ namespace StdAvgCal.Model.Existence
             }
 
             return answer;
+        }
+
+        public double GetRoundedScore(int roundingBound)
+        {
+            return RoundDouble(Score, roundingBound);
         }
 
     }
