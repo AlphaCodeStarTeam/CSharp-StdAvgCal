@@ -20,12 +20,7 @@ namespace StdAvgCal.Controller.Utils
         public List<Student> StudentsRanking { get =>_studentsRanking;}
         public StudentsMapper()
         {
-            Initializers = new List<IInitialize.Init>()
-            {
-                new IInitialize.Init(InitFromFiles),
-                new IInitialize.Init(InitStudentScores),
-                new IInitialize.Init(InitStudentsRanking)
-            };
+            Initializers = new List<IInitialize.Init>() { InitFromFiles, InitStudentScores, InitStudentsRanking };
         }
 
         private void InitFromFiles()

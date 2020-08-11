@@ -13,10 +13,7 @@ namespace StdAvgCal.Controller
 
         public Controller()
         {
-            Initializers = new List<IInitialize.Init>()
-            {
-                new IInitialize.Init(InitMapper)
-            };
+            Initializers = new List<IInitialize.Init>() { InitMapper };
         }
 
         public void InitMapper()
