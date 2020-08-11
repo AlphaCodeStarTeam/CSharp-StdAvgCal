@@ -15,6 +15,7 @@ namespace StdAvgCal.Controller.Utils
         private List<StudentScore> _scores;
         private List<Student> _students;
         private List<Student> _studentsRanking;
+        public bool IsInit { get; set; }
         public List<IInitialize.Init> Initializers { get; }
 
         public List<Student> StudentsRanking { get =>_studentsRanking;}
@@ -61,20 +62,30 @@ namespace StdAvgCal.Controller.Utils
 
         public double GetAvgByStudent(int studentNumber)
         {
+            CheckInit();
             return _logs[studentNumber];
         }
 
         public List<StudentScore> GetStudentScores(int studentNumber)
         {
+            CheckInit();
             return _studentScores[studentNumber];
         }
         
         public Student GetStudentByFullName(string firstName, string lastName)
         {
+            CheckInit();
             Student student = _students.Find(std => std.FullName.Equals(firstName + " " + lastName));
             if(student == null)
                 throw new StudentNotFoundException();
             return student;
+        }
+        
+        public bool CheckInit()
+        {
+            if (IsInit)
+                return true;
+            throw new NotInitializedException();
         }
     }
 }
