@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using StdAvgCal.Controller;
+using StdAvgCal.Controller.Utils;
 using StdAvgCal.Model.Existence;
 
 namespace StdAvgCal.View
@@ -38,62 +40,130 @@ namespace StdAvgCal.View
         {
             Executors.Add("^show (\\S+) (\\S+) average$", args => ShowAverage(args[0], args[1]));
             Executors.Add("^show (\\S+) (\\S+) scores$", args => ShowScores(args[0], args[1]));
-            Executors.Add("^show rankings( -\\d+)?$", args => ShowRankings(args[0].Equals("") ? Int32.MaxValue : Int32.Parse(args[0].Substring(2))));
-        }
-
-        private void ShowRankings(int rankingNumber)
-        {
-            Console.WriteLine("Here");
-            if (rankingNumber == 0)
+            // Executors.Add("^show rankings( -\\d+)?$", args => ShowRankings(args[0].Equals("") ? Int32.MaxValue : Int32.Parse(args[0].Substring(2))));
+            Executors.Add("^show rankings( -\\d+)?$", args =>
             {
-                PrintWithDesign("Please Enter An Integer", true, DefaultBackGroundColor, ConsoleColor.DarkRed);
-                return;
-            }
-            List<Student> studentsOrderedByRank = _alphaController.GetStudentsRanking(rankingNumber);
-            int studentRankingSize = _alphaController.GetRankingSize();
-            PrintWithDesign("#Student Ranking:\n", true, DefaultBackGroundColor, ConsoleColor.DarkCyan);
-            for (int i = 0; i < studentsOrderedByRank.Count; i++)
-            {
-                Student student = studentsOrderedByRank[i];
-                String line = "";
-                ConsoleColor lineColor;
-                switch (i)
+                switch (args[0])
                 {
-                    case 0:
-                        line += "🥇 ";
-                        lineColor = ConsoleColor.DarkYellow;
+                    case "":
+                        ShowRankings();
                         break;
-                    case 1:
-                        line += "🥈 ";
-                        lineColor = ConsoleColor.DarkGray;
-                        break;
-                    case 2:
-                        line += "🥉 ";
-                        lineColor = ConsoleColor.DarkRed;
+                    case " -0":
+                        PrintErr("Please Enter An Integer", true);
                         break;
                     default:
-                        line += "" + (i + 1) + ". ";
-                        lineColor = ConsoleColor.DarkBlue;
+                        ShowRankings(Int32.Parse(args[0].Substring(2)));
                         break;
                 }
-                line += student.FullName + ", Avg: " + _alphaController.GetAvg(student.StudentNumber);
-                PrintWithDesign(line, true, DefaultBackGroundColor, lineColor);
-            }
+            });
+        }
 
+        private void ShowRankings(int rankingNumber = Int32.MaxValue)
+        {
+            List<Tuple<Student, double>> studentsOrderedByRank = _alphaController.GetStudentsRanking(rankingNumber);
+            int studentRankingSize = _alphaController.GetRankingSize();
+            PrintRankings(studentsOrderedByRank);
             if (rankingNumber < studentRankingSize)
             {
-                Console.WriteLine("\t.\n\t.\n\t.\n");
+                Console.WriteLine("\t\t.\n\t\t.\n\t\t.\n");
             }
+            else
+            {
+                Console.WriteLine("");
+            }
+        }
+
+        private void PrintRankings(List<Tuple<Student, double>> studentsOrderedByRank)
+        {
+            PrintWithDesign("#Student Ranking:", true, DefaultBackGroundColor, ConsoleColor.White);
+            for (int i = 0; i < studentsOrderedByRank.Count; i++)
+            {
+                Student student = studentsOrderedByRank[i].Item1;
+                double avg = studentsOrderedByRank[i].Item2;
+                var tuple = SetPosition(i + 1);
+                string line = tuple.Item1;
+                var lineColor = tuple.Item2;
+                line += student.FullName + ", Avg: " + avg;
+                PrintWithDesign(line, true, DefaultBackGroundColor, lineColor);
+            }
+        }
+
+        private Tuple<string, ConsoleColor> SetPosition(int number)
+        {
+            string line = "";
+            ConsoleColor lineColor;
+            switch (number)
+            {
+                case 1:
+                    line += "🥇 ";
+                    lineColor = ConsoleColor.DarkYellow;
+                    break;
+                case 2:
+                    line += "🥈 ";
+                    lineColor = ConsoleColor.DarkGray;
+                    break;
+                case 3:
+                    line += "🥉 ";
+                    lineColor = ConsoleColor.DarkRed;
+                    break;
+                default:
+                    line += "" + number + ". ";
+                    lineColor = ConsoleColor.DarkBlue;
+                    break;
+            }
+
+            return new Tuple<string, ConsoleColor>(line, lineColor);
         }
 
         private void ShowScores(string firstName, string lastName)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Student student = _alphaController.GetStudentByFullName(firstName, lastName);
+                PrintWithDesign(student.FullName + "Scores (descending Order):", true, DefaultBackGroundColor, ConsoleColor.Yellow);
+                var scores = _alphaController.GetStudentScores(student.StudentNumber);
+                scores.Sort((s1, s2) => s2.Score.CompareTo(s1.Score));
+                int i = 0;
+                foreach (var score in scores)
+                {
+                    PrintWithDesign("" + (++i) + ". " + score, true, DefaultBackGroundColor, ConsoleColor.Blue);
+                }
+
+                Console.WriteLine();
+            }
+            catch (StudentNotFoundException e)
+            {
+                PrintErr("No Student With Such Name!", true);
+            }
         }
 
         private void ShowAverage(string firstName, string lastName)
         {
-            throw new NotImplementedException();
+            try
+            {
+                Student student = _alphaController.GetStudentByFullName(firstName, lastName);
+                PrintWithDesign(student.FullName, false, DefaultBackGroundColor, ConsoleColor.White);
+                Console.Write(", ");
+                PrintWithDesign("Lessons: " + GetCollectionAsString(student.Lessons) , false, DefaultBackGroundColor, ConsoleColor.DarkMagenta);
+                Console.Write(", ");
+                PrintWithDesign("Average: " + _alphaController.GetAvg(student.StudentNumber), true, DefaultBackGroundColor, ConsoleColor.Cyan);
+                Console.WriteLine();
+            }
+            catch (StudentNotFoundException e)
+            {
+                PrintErr("No Student With Such Name!", true);
+            }
+        }
+
+        private String GetCollectionAsString<T>(IEnumerable<T> collection)
+        {
+            String line = "{";
+            foreach (var collectible in collection)
+            {
+                line += collectible + ", ";
+            }
+
+            return line.Substring(0, line.Length - 2) + "}";
         }
     }
 }

@@ -14,8 +14,10 @@ namespace StdAvgCal.View
         private readonly Tuple<string, ConsoleColor> ApplicationExit;
 
 
-        protected ConsoleColor DefaultBackGroundColor = Console.BackgroundColor;
-        protected ConsoleColor DefaultForeGroundColor = Console.ForegroundColor;
+        protected readonly ConsoleColor DefaultBackGroundColor = Console.BackgroundColor;
+        protected readonly ConsoleColor DefaultForeGroundColor = Console.ForegroundColor;
+        protected readonly ConsoleColor ErrorForeGround = ConsoleColor.DarkRed;
+        
         
         protected Application(Tuple<string, ConsoleColor> applicationIntro, 
             Tuple<string, ConsoleColor> applicationRun, 
@@ -50,7 +52,7 @@ namespace StdAvgCal.View
                 }
                 catch (MethodNotFoundException e)
                 {
-                    PrintWithDesign("Invalid Command", true, DefaultBackGroundColor, ConsoleColor.DarkRed);
+                    PrintErr("Invalid Command", true);
                 }
                 catch (ExitException e)
                 {
@@ -84,6 +86,11 @@ namespace StdAvgCal.View
 
             Console.BackgroundColor = DefaultBackGroundColor;
             Console.ForegroundColor = DefaultForeGroundColor;
+        }
+
+        protected void PrintErr(string text, bool isLine)
+        {
+            PrintWithDesign(text + "\n", isLine, DefaultBackGroundColor, ErrorForeGround);
         }
 
         public Dictionary<string, IExecute.Execute> Executors { get; }

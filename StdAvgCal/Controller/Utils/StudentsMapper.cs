@@ -36,10 +36,11 @@ namespace StdAvgCal.Controller.Utils
             _logs = new Dictionary<int, double>();
             foreach (var studentWithScores in 
                 _students
-                    .Select(std => new {numb = std.StudentNumber, scores = GetScores(std.StudentNumber)}))
+                    .Select(std => new {std, scores = GetScores(std.StudentNumber)}))
             {
-                _studentScores.Add(studentWithScores.numb, studentWithScores.scores);
-                _logs.Add(studentWithScores.numb, studentWithScores.scores.Average(score => score.Score));
+                _studentScores.Add(studentWithScores.std.StudentNumber, studentWithScores.scores);
+                studentWithScores.std.Lessons.UnionWith(_scores.Select(score => score.Lesson));
+                _logs.Add(studentWithScores.std.StudentNumber, studentWithScores.scores.Average(score => score.Score));
             }
         }
         
@@ -75,7 +76,7 @@ namespace StdAvgCal.Controller.Utils
         public Student GetStudentByFullName(string firstName, string lastName)
         {
             CheckInit();
-            Student student = _students.Find(std => std.FullName.Equals(firstName + " " + lastName));
+            Student student = _students.Find(std => std.FullName.Equals(firstName + " " + lastName, StringComparison.InvariantCultureIgnoreCase));
             if(student == null)
                 throw new StudentNotFoundException();
             return student;

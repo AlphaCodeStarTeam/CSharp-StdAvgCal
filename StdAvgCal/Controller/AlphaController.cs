@@ -25,18 +25,12 @@ namespace StdAvgCal.Controller
             ((IInitialize)_mapper).InitMe();
         }
 
-        public List<StudentScore> GetStudentScores(string firstName, string lastName)
+        public List<StudentScore> GetStudentScores(int studentNamber)
         {
             CheckInit();
-            return _mapper.GetStudentScores(_mapper.GetStudentByFullName(firstName, lastName).StudentNumber);
+            return _mapper.GetStudentScores(studentNamber);
         }
-
-
-        public double GetAvg(string firstName, string lastName)
-        {
-            CheckInit();
-            return _mapper.GetAvgByStudent(_mapper.GetStudentByFullName(firstName, lastName).StudentNumber);
-        }
+        
 
         public double GetAvg(int studentNumber)
         {
@@ -45,11 +39,12 @@ namespace StdAvgCal.Controller
         }
         
 
-        public List<Student> GetStudentsRanking(int n)
+        public List<Tuple<Student, double>> GetStudentsRanking(int n)
         {
             CheckInit();
             return _mapper.StudentsRanking
                 .Take(n)
+                .Select(student => new Tuple<Student, double>(student, GetAvg(student.StudentNumber)))
                 .ToList();
         }
 
@@ -57,6 +52,12 @@ namespace StdAvgCal.Controller
         {
             CheckInit();
             return _mapper.StudentsRanking.Count;
+        }
+
+        public Student GetStudentByFullName(String firstName, String lastName)
+        {
+            CheckInit();
+            return _mapper.GetStudentByFullName(firstName, lastName);
         }
         
         public bool CheckInit()

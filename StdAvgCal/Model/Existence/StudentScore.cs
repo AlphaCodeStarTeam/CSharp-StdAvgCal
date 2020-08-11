@@ -32,5 +32,9 @@ namespace StdAvgCal.Model.Existence
             return RoundDouble(Score, roundingBound);
         }
 
+        public override string ToString()
+        {
+            return "\"" + Lesson + "\" With Score: " + Score;
+        }
     }
 }
