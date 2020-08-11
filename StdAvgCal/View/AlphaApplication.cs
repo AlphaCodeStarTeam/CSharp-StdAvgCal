@@ -6,28 +6,34 @@ namespace StdAvgCal.View
     public class AlphaApplication : Application
     {
         private new const string ApplicationName = "Alpha-Avg";
-        private new const ConsoleColor ApplicationNameColor = ConsoleColor.Magenta;
+        private new const ConsoleColor AlphaNameFontColor = ConsoleColor.Magenta;
+        private new const ConsoleColor AlphaIntroFontColor = ConsoleColor.DarkCyan;
+        private new const ConsoleColor AlphaHelpFontColor = ConsoleColor.DarkGreen;
 
-        public AlphaApplication() : base(ApplicationName, ApplicationNameColor) { }
+        public AlphaApplication() : base(ApplicationName, AlphaNameFontColor) { }
 
         protected override void SetConsoleDesign()
         {
-            throw new System.NotImplementedException();
+            //Todo
         }
 
         protected override void SayHello()
         {
-            throw new System.NotImplementedException();
+            string hello = "Hello, This Is " + ApplicationName + "." +
+                           "\nHow Can We Help You?" +
+                           "\n";
+            PrintWithDesign(hello, true, DefaultBackGroundColor, AlphaIntroFontColor);
         }
 
         protected override void ShowHelp()
         {
-            throw new System.NotImplementedException();
+            string help = "";
+            PrintWithDesign(help, true, DefaultBackGroundColor, AlphaHelpFontColor);
         }
 
         public override void InitExecutors()
         {
-            throw new System.NotImplementedException();
+            //Todo
         }
     }
 }

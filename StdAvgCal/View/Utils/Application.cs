@@ -5,10 +5,14 @@ using StdAvgCal.View.Utils;
 
 namespace StdAvgCal.View
 {
+
     public abstract class Application : IExecute
     {
         protected readonly string ApplicationName;
         protected readonly ConsoleColor ApplicationNameColor;
+
+        protected ConsoleColor DefaultBackGroundColor = Console.BackgroundColor;
+        protected ConsoleColor DefaultForeGroundColor = Console.ForegroundColor;
         
         protected abstract void SetConsoleDesign();
         protected abstract void SayHello();
@@ -27,7 +31,33 @@ namespace StdAvgCal.View
 
         public void run()
         {
-            throw new System.NotImplementedException();
+            string commandPrefix = ApplicationName + "> ";
+            string input = "";
+            while (true)
+            {
+                PrintWithDesign(commandPrefix, false, DefaultBackGroundColor, ApplicationNameColor);
+                input = Console.ReadLine();
+
+                try
+                {
+                    ((IExecute) this).ExecuteCommand(input);
+                }
+                catch (MethodNotFoundException e)
+                {
+                    PrintWithDesign("Invalid Command", true, DefaultBackGroundColor, ConsoleColor.DarkRed);
+                }
+            }
+        }
+
+        protected void PrintWithDesign(string text, bool isLine, ConsoleColor backGroundColor , ConsoleColor foreGroundColor)
+        {
+            Console.BackgroundColor = backGroundColor;
+            Console.ForegroundColor = foreGroundColor;
+
+            Console.Write("{0}{1}", text, (isLine ? "\n" : ""));
+
+            Console.BackgroundColor = DefaultBackGroundColor;
+            Console.ForegroundColor = DefaultForeGroundColor;
         }
 
         public Dictionary<string, IExecute.Execute> Executors { get; }

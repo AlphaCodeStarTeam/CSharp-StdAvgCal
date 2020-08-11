@@ -18,8 +18,13 @@ namespace StdAvgCal.View.Utils
             {
                 match = Regex.Match(command, inputRegex);
                 if (match.Success)
+                {
                     Executors[inputRegex].Invoke(GetParameters(match.Groups));
+                    return;
+                }
             }
+
+            throw new MethodNotFoundException();
         }
 
         private static string[] GetParameters(GroupCollection groupCollection)
@@ -32,4 +37,6 @@ namespace StdAvgCal.View.Utils
         }
 
     }
+    
+    public class MethodNotFoundException : Exception { }
 }
