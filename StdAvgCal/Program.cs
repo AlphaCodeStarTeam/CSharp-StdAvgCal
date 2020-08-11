@@ -9,6 +9,7 @@ namespace StdAvgCal
     {
         static void Main(string[] args)
         {
+            
             new AlphaApplication().run();
         }
     }

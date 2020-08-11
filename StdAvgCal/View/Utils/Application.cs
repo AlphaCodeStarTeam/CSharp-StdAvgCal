@@ -57,6 +57,7 @@ namespace StdAvgCal.View
                 catch (ExitException e)
                 {
                     PrintWithDesign(ApplicationExit.Item1, true, DefaultBackGroundColor, ApplicationExit.Item2);
+                    break;
                 }
             }
         }

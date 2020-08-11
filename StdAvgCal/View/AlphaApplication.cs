@@ -19,13 +19,14 @@ namespace StdAvgCal.View
                                                                                                               "\nHow Can We Help You?" +
                                                                                                               "\n", ConsoleColor.DarkCyan);
             
-            internal static readonly Tuple<String, ConsoleColor> AlphaHelp = new Tuple<string, ConsoleColor>("-> show (FirstName) (LastName) average \n" +
+            internal static readonly Tuple<String, ConsoleColor> AlphaHelp = new Tuple<string, ConsoleColor>("-* Commands(IgnoreCase): \n" +
+                                                                                                             "-> show (FirstName) (LastName) average \n" +
                                                                                                              "-> show (FirstName) (LastName) scores \n" +
                                                                                                              "-> show rankings (-Number) \n" +
-                                                                                                             "-> help \n" +
+                                                                                                             "-> show help \n" +
                                                                                                              "-> exit", ConsoleColor.DarkGreen);
 
-            internal static readonly Tuple<string, ConsoleColor> AlphaExit = new Tuple<string, ConsoleColor>("AlphaTeam Appreciates Your Usage. GoodBye 👋", ConsoleColor.Black);
+            internal static readonly Tuple<string, ConsoleColor> AlphaExit = new Tuple<string, ConsoleColor>("AlphaTeam Appreciates Your Usage. GoodBye", ConsoleColor.Black);
         }
 
 
@@ -95,15 +96,15 @@ namespace StdAvgCal.View
             switch (number)
             {
                 case 1:
-                    line += "🥇 ";
+                    line += "1. ";
                     lineColor = ConsoleColor.DarkYellow;
                     break;
                 case 2:
-                    line += "🥈 ";
-                    lineColor = ConsoleColor.DarkGray;
+                    line += "2. ";
+                    lineColor = ConsoleColor.Gray;
                     break;
                 case 3:
-                    line += "🥉 ";
+                    line += "3. ";
                     lineColor = ConsoleColor.DarkRed;
                     break;
                 default:
