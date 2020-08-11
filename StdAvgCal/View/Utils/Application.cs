@@ -8,35 +8,41 @@ namespace StdAvgCal.View
 
     public abstract class Application : IExecute
     {
-        protected readonly string ApplicationName;
-        protected readonly ConsoleColor ApplicationNameColor;
+        private readonly Tuple<string, ConsoleColor> ApplicationIntro;
+        private readonly Tuple<string, ConsoleColor> ApplicationRun;
+        private readonly Tuple<string, ConsoleColor> ApplicationHelp;
+        private readonly Tuple<string, ConsoleColor> ApplicationExit;
+
 
         protected ConsoleColor DefaultBackGroundColor = Console.BackgroundColor;
         protected ConsoleColor DefaultForeGroundColor = Console.ForegroundColor;
         
-        protected abstract void SetConsoleDesign();
-        protected abstract void SayHello();
-        protected abstract void ShowHelp();
-
-        protected Application(string applicationName, ConsoleColor applicationNameColor)
+        protected Application(Tuple<string, ConsoleColor> applicationIntro, 
+            Tuple<string, ConsoleColor> applicationRun, 
+            Tuple<string, ConsoleColor> applicationHelp, 
+            Tuple<string, ConsoleColor> applicationExit)
         {
-            ApplicationName = applicationName;
-            ApplicationNameColor = applicationNameColor;
-            SetConsoleDesign();
+            ApplicationRun = applicationRun;
+            ApplicationExit = applicationExit;
+            ApplicationIntro = applicationIntro;
+            ApplicationHelp = applicationHelp;
+            
             SayHello();
+            
             Executors = new Dictionary<string, IExecute.Execute>();
             Executors.Add("^show help$", args => ShowHelp());
+            Executors.Add("^exit$", args => Exit());
             InitExecutors();
         }
 
         public void run()
         {
-            string commandPrefix = ApplicationName + "> ";
+            string commandPrefix = ApplicationRun.Item1 + "> ";
             string input = "";
             while (true)
             {
-                PrintWithDesign(commandPrefix, false, DefaultBackGroundColor, ApplicationNameColor);
-                input = Console.ReadLine();
+                PrintWithDesign(commandPrefix, false, DefaultBackGroundColor, ApplicationRun.Item2);
+                input = Console.ReadLine().Trim().ToLower();
 
                 try
                 {
@@ -46,7 +52,27 @@ namespace StdAvgCal.View
                 {
                     PrintWithDesign("Invalid Command", true, DefaultBackGroundColor, ConsoleColor.DarkRed);
                 }
+                catch (ExitException e)
+                {
+                    PrintWithDesign(ApplicationExit.Item1, true, DefaultBackGroundColor, ApplicationExit.Item2);
+                }
             }
+        }
+
+        protected void SayHello()
+        {
+            PrintWithDesign(ApplicationIntro.Item1, true, DefaultBackGroundColor, ApplicationIntro.Item2);
+        }
+
+
+        protected void ShowHelp()
+        {
+            PrintWithDesign(ApplicationHelp.Item1, true, DefaultBackGroundColor, ApplicationHelp.Item2);
+        }
+        
+        private void Exit()
+        {
+            throw new ExitException();
         }
 
         protected void PrintWithDesign(string text, bool isLine, ConsoleColor backGroundColor , ConsoleColor foreGroundColor)
@@ -63,5 +89,7 @@ namespace StdAvgCal.View
         public Dictionary<string, IExecute.Execute> Executors { get; }
         public abstract void InitExecutors();
     }
-    
+
+    public class ExitException : Exception { }
+
 }
